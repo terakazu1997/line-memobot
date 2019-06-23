@@ -4,9 +4,9 @@
 * スプレッドシートが更新されたタイイングで実行されcontrollerを呼び出す。
 * main.gs 
 */
-var dictSheet=SpreadsheetApp.getActive().getSheetByName('辞書');
 
-function getSpreadSheet() {
-    controller();
+function doPost(e) {
+    var json = JSON.parse(e.postData.contents);
+    controller(json);
     return;
 }
