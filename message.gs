@@ -1,5 +1,5 @@
 //Discordに表示するメッセージをスプレッドシートの【メッセージシート】から取得した変数群
-var messageSheet = SpreadsheetApp.openById("16X9I2FpY6moUSBHwOoOMxWPk7s59cE6mdB7BguBmjcA").getSheetByName('メッセージ');
+var messageSheet = SpreadsheetApp.getActive().getSheetByName('メッセージ');
 var msWord = messageSheet.getRange("A1").getValue()
 var msMean = messageSheet.getRange("A2").getValue();
 var msInsertUrl = messageSheet.getRange("A3").getValue();

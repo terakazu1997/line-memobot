@@ -3,7 +3,8 @@
 *
 * config.gs  
 */
-var infoSheet = SpreadsheetApp.openById("16X9I2FpY6moUSBHwOoOMxWPk7s59cE6mdB7BguBmjcA").getSheetByName('情報');
-var CHANNEL_ACCESS_TOKEN = infoSheet.getRange("A1").getValue();
-var line_endpoint = infoSheet.getRange("A2").getValue();
-var add_info = infoSheet.getRange("A3").getValue();
+var infoSheet = SpreadsheetApp.getActive().getSheetByName('情報');
+var webhookUrl = infoSheet.getRange("A1").getValue();
+var token = infoSheet.getRange("A2").getValue();;
+var channelname　= infoSheet.getRange("A3").getValue();;
+var username　= infoSheet.getRange("A4").getValue();;

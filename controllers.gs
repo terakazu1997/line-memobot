@@ -2,34 +2,28 @@
 * 処理を振り分けるファイル
 *
 * 基本的に入力された単語の状態orスプレッドシートのoperatonFlagの状態で呼び出すactionを変化させる。
-* Actionから渡された値と返信用トークンを元にLineにメッセージを送信。
+*
 * controllers.gs 
 */
-function controller(json) {
-    var reply_token= json.events[0].replyToken;
-    if (typeof reply_token === 'undefined')return;
-    var keyword=keywordSplit(json.events[0].message.text);
-    var userid =json.events[0].source.userId+add_info;
-    var dictSheet = getSpreadSheet(userid);
-    if(dictSheet === ""){
-        sendToLineAction(msCreateSheet+msHelp,reply_token);
-        return;
-    }
-    var wordList = dictSheet.getRange(1,1,dictSheet.getLastRow()).getValues(); 
-    var operationFlag = dictSheet.getRange("C2").getValue();
+
+function controller() {
+    var keyword=keywordSplit(dictSheet.getRange("A2").getValue());
+    var wordList = dictSheet.getRange(1,2,dictSheet.getLastRow()).getValues(); 
+    var operationFlag = dictSheet.getRange("D2").getValue();
+    dictSheet.getRange(2, 1).clear();
     if(keyword === "")return;
     var targetCmd = keyword.slice(0,3);
     var findCmd = keyword.slice(0,5);
     
     //url判定
     if(targetCmd === "url" && operationFlag != "L"){
-        urlJudgeAction(dictSheet,keyword,operationFlag);
+        urlJudgeAction(keyword,operationFlag);
         return;
     }
     
     //入力値置換の結果""になっていないか判定
     if (keyword === "NG"){
-        sendToLineAction(msNoUseWord,reply_token);
+        sendToDiscordAction(msNoUseWord);
         return;
     }
     
@@ -38,67 +32,55 @@ function controller(json) {
         //50件目以降のリストはnが入力された場合のみ次の50件を表示する。n以外が入力時は次の入力確認へ。
         case "L":  
             if(keyword === 'n'){
-                var sendListMessage = listDefaultAction(dictSheet,wordList);
-                sendToLineAction(sendListMessage,reply_token);
+                listDefaultAction(wordList);
                 return;
             }
-            dictSheet.getRange("C2").setValue('F');
-            dictSheet.getRange("C3").setValue(0);
+            dictSheet.getRange("D2").setValue('F');
+            dictSheet.getRange("D3").setValue(0);
             break;
         case "I":
-            var sendInsertMessage = insertAction(dictSheet,keyword);
-            sendToLineAction(sendInsertMessage,reply_token);
+            insertAction(keyword);
             return;
         case "U":
         case "u":
-            var sendUpdateMessage=updateAction(dictSheet,keyword,wordList,operationFlag);
-            sendToLineAction(sendUpdateMessage,reply_token);
+            updateAction(keyword,wordList,operationFlag);
             return;
     }
     
     //入力値判定 help(ヘルプ表示） list -a,ls -a(全件表示）list,　ls(0〜50件目までのリスト表示)　
     switch (keyword){
         case "help":
-            var sendHelpMessage = helpAction();
-            sendToLineAction(sendHelpMessage,reply_token);
+            helpAction();
             return;
         case "list -a":
         case "ls -a":
-            var sendListAllMessage = listAllAction(wordList);
-            sendToLineAction(sendListAllMessage,reply_token);
+            listAllAction(wordList);
             return;
         case "list":
         case "ls":
-            var sendListMessage = listDefaultAction(dictSheet,wordList);
-            sendToLineAction(sendListMessage,reply_token);
+            listDefaultAction(wordList);
             return;
     }
    
     //入力値判定2 前3文字がrm (削除）,　up (更新チェック)
     switch(targetCmd){
         case "rm ":
-            var sendRemoveMessage =removeAction(dictSheet,keyword,wordList);
-            sendToLineAction(sendRemoveMessage,reply_token);
+            removeAction(keyword,wordList);
             return;
         case "up ":
-            var sendUpdateCheckMessage = updateCheckAction(dictSheet,keyword,wordList);
-            sendToLineAction(sendUpdateCheckMessage,reply_token);
+            updateCheckAction(keyword,wordList);
             return;
     }
    
    //入力値判定3 前5文字がfind　(文字一致検索)
     if(findCmd == "find "){
-        var sendFindMessage =findAction(keyword,wordList);
-        sendToLineeAction(sendFindMessage,reply_token);
+        findAction(keyword,wordList);
         return;
     }
-    var sendMeanMessage = wordMeanAction(dictSheet,keyword,wordList)
+   
     //入力値判定4 入力された単語が存在しない(単語の追加チェック）　存在する（単語と意味表示）
-    if(sendMeanMessage===false){
-        var sendInsertCheckMessage =insertCheckAction(dictSheet,keyword);
-        sendToLineAction(sendInsertCheckMessage,reply_token);
+    if(wordMeanAction(keyword,wordList)===false){
+        insertCheckAction(keyword);
         return;
     }
-    sendToLineAction(sendMeanMessage,reply_token);
-    return;
 }
