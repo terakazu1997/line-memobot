@@ -151,11 +151,12 @@ function updateCheckAction(dictSheet,keyword,wordList){
             return checkWord+msUpMean;
         }
     }
-    dictSheet.getRange("C2").setValue('I');
+    
     if(keyword.slice(3,6)==='-w '){
         if(optionUpword.length > 12){
            return msNoUpWord;
         }
+        dictSheet.getRange("C2").setValue('I');
         dictSheet.getRange(i+1,1).setValue(optionUpword);
         return optionUpword+msInsertWord;
         
@@ -164,6 +165,7 @@ function updateCheckAction(dictSheet,keyword,wordList){
         return msNoUpWord;
         
     }
+    dictSheet.getRange("C2").setValue('I');
     dictSheet.getRange(i+1,1).setValue(upword);
     return upword+msInsertWord;
     
