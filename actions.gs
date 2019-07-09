@@ -249,6 +249,7 @@ function listDefaultAction(dictSheet,wordList){
         words += '▶︎'+wordList[i] + " ";
         displayNumber += 1;
     }
+    dictSheet.getRange("C2").setValue('F');
     dictSheet.getRange("C3").setValue(0);
     return words+String.fromCharCode(10)+displayNumber+msDisplayResultCnt;
 }
